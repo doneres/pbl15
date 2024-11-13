@@ -7,6 +7,8 @@ public class App {
     private static ArrayList<Integer> nascimento = new ArrayList<Integer>();
     private static ArrayList<String> telefone = new ArrayList<String>();
     private static ArrayList<String> senha = new ArrayList<String>();
+    private static ArrayList<String> user = new ArrayList<String>();
+    private static ArrayList<String> pass = new ArrayList<String>();
 
     public static void main(String[] args) {
         while (true) {
@@ -36,7 +38,7 @@ public class App {
                 case 3:
                     GerarTitulo("Portal administrativo");
 
-                    login();
+                    logar();
                 case 4:
                     System.out.println("Obrigado por usar o programa!");
                     sc.close();
@@ -197,75 +199,83 @@ public class App {
         System.out.println("Usuário deletado com sucesso!");
     }
 
-    public static int login() {
-        int cont = 0;
-        while (cont <= 3) {
+    public static int logar() {
 
-            System.out.print("Usuário: ");
-            String user = sc.nextLine();
+        //Finalizar lógica de login
 
-            System.out.print("Senha: ");
-            String pass = sc.nextLine();
+        user.add("admin");
+        pass.add("admin");
 
-            if (user.equals("admin") && pass.equals("admin")) {
-                System.out.printf("%nBem vindo, %s, este é o portal administrativo!%n%n", user);
+        System.out.print("Usuário: ");
+        String user = sc.nextLine();
 
-                System.out.printf("""
-                        Escolha uma opção:
+        System.out.print("Senha: ");
+        String pass = sc.nextLine();
 
-                        1 - Cadastrar um usuário (Create);
-                        2 - Consultar usuários cadastrados (Reade);
-                        3 - Consultar um determinado usuário (Reade);
-                        4 - Atualizar um registro de usuário (Update);
-                        5 - Deletar um registro de usuário (Delete);
-                        6 - Sair;
-                        """);
+        if (nomes.get(0).equals(user) && senha.get(0).equals(pass)) {
 
-                int escolha = sc.nextInt();
-                sc.nextLine();
-                switch (escolha) {
-                    case 1:
-                        CadastrarUsuario();
-                        break;
-                    case 2:
-                        ConsultarUsuarios();
-                        break;
-                    case 3:
-                        ConsultarUsuario();
-                        break;
-                    case 4:
-                        AtualizarUsuario();
-                        break;
-                    case 5:
-                        deletarUsuario();
-                        break;
-                    case 6:
-                        sc.close();
-                        return 0;
-                    default:
-                        System.out.println("Opção inválida. Por favor, escolha uma opção válida. \n");
-                        return 1;
-                }
+            login();
 
-            } else {
-                System.out.println("\nUsuário ou senha inválidos. Tente novamente.\n");
-                cont++;
+        } else {
+            int cont = 1;
+            while (cont < 3) {
+
+                System.out.println("Usuário ou senha inválidos. Tente novamente.\n");
 
                 System.out.println("Deseja resgatar sua senha? (S/N)");
                 String resgatar = sc.nextLine();
 
-                if(resgatar.equalsIgnoreCase("s")){
+                if (resgatar.equalsIgnoreCase("s")) {
                     resgatarSenha();
                 }
-
             }
 
-            if(cont == 2){
-                System.out.println("Você excedeu o número de tentativas. Tente novamente mais tarde.\n");
-                return 0;
-
-            }
+            cont++;
         }
+        return 1;
+    }
+
+    public static int login() {
+
+        System.out.printf("%nBem vindo, %s, este é o portal administrativo!%n%n", user);
+
+        System.out.printf("""
+                Escolha uma opção:
+
+                1 - Cadastrar um usuário (Create);
+                2 - Consultar usuários cadastrados (Reade);
+                3 - Consultar um determinado usuário (Reade);
+                4 - Atualizar um registro de usuário (Update);
+                5 - Deletar um registro de usuário (Delete);
+                6 - Sair;
+                """);
+
+        int escolha = sc.nextInt();
+        sc.nextLine();
+        switch (escolha) {
+            case 1:
+                CadastrarUsuario();
+                break;
+            case 2:
+                ConsultarUsuarios();
+                break;
+            case 3:
+                ConsultarUsuario();
+                break;
+            case 4:
+                AtualizarUsuario();
+                break;
+            case 5:
+                deletarUsuario();
+                break;
+            case 6:
+                sc.close();
+                return 0;
+            default:
+                System.out.println("Opção inválida. Por favor, escolha uma opção válida. \n");
+                return 1;
+        }
+
         return 1;
     }
 
