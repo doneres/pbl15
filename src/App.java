@@ -4,11 +4,9 @@ import java.util.Scanner;
 public class App {
     private static Scanner sc = new Scanner(System.in);
     private static ArrayList<String> nomes = new ArrayList<String>();
-    private static ArrayList<Integer> nascimento = new ArrayList<Integer>();
     private static ArrayList<String> telefone = new ArrayList<String>();
     private static ArrayList<String> senha = new ArrayList<String>();
     private static ArrayList<String> user = new ArrayList<String>();
-    private static ArrayList<String> pass = new ArrayList<String>();
 
     public static void main(String[] args) {
         while (true) {
@@ -60,11 +58,6 @@ public class App {
         String nome = sc.nextLine();
         nomes.add(nome);
 
-        System.out.print("Data de nascimento (DDMMYYYY): ");
-        int dataNascimento = sc.nextInt();
-        nascimento.add(dataNascimento);
-        sc.nextLine();
-
         System.out.print("Telefone (11 1 1111-1111): ");
         String numero = sc.nextLine();
         telefone.add(numero);
@@ -83,7 +76,6 @@ public class App {
             for (int i = 0; i < nomes.size(); i++) {
                 System.out.println("Usuário #" + (i + 1));
                 System.out.println("Nome: " + nomes.get(i));
-                System.out.println("Nascimento: " + nascimento.get(i));
                 System.out.println("Telefone: " + telefone.get(i));
                 System.out.println("-----------------------");
             }
@@ -105,7 +97,6 @@ public class App {
 
         System.out.println(" ");
         System.out.println("Nome: " + nomes.get(index));
-        System.out.println("Nascimento: " + nascimento.get(index));
         System.out.println("Telefone: " + telefone.get(index));
 
     }
@@ -130,9 +121,8 @@ public class App {
         System.out.printf("""
 
                     1 - Nome
-                    2 - Data de Nascimento
-                    3 - Telefone
-                    4 - Senha
+                    2 - Telefone
+                    3 - Senha
 
                 """);
         System.out.print("Escolha uma opção: ");
@@ -148,20 +138,13 @@ public class App {
                 break;
 
             case 2:
-                System.out.print("Digite a nova data de nascimento (DDMMYYYY): ");
-                int novaDataNascimento = sc.nextInt();
-                nascimento.set(usuarioSelecionado, novaDataNascimento);
-                System.out.println("Data de nascimento atualizada com sucesso!");
-                break;
-
-            case 3:
                 System.out.print("Digite o novo telefone: ");
                 String novoTelefone = sc.nextLine();
                 telefone.set(usuarioSelecionado, novoTelefone);
                 System.out.println("Telefone atualizado com sucesso!");
                 break;
 
-            case 4:
+            case 3:
                 System.out.print("Digite a nova senha: ");
                 String novaSenha = sc.nextLine();
                 senha.set(usuarioSelecionado, novaSenha);
@@ -192,7 +175,6 @@ public class App {
         }
 
         nomes.remove(usuarioSelecionado);
-        nascimento.remove(usuarioSelecionado);
         telefone.remove(usuarioSelecionado);
         senha.remove(usuarioSelecionado);
 
@@ -204,7 +186,7 @@ public class App {
         //Finalizar lógica de login
 
         user.add("admin");
-        pass.add("admin");
+        senha.add("admin");
 
         System.out.print("Usuário: ");
         String user = sc.nextLine();
@@ -212,7 +194,7 @@ public class App {
         System.out.print("Senha: ");
         String pass = sc.nextLine();
 
-        if (nomes.get(0).equals(user) && senha.get(0).equals(pass)) {
+        if (user.get(0).equals(user) && senha.get(0).equals(pass)) {
 
             login();
 
