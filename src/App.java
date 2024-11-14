@@ -6,7 +6,7 @@ public class App {
     private static ArrayList<String> nomes = new ArrayList<String>();
     private static ArrayList<String> telefone = new ArrayList<String>();
     private static ArrayList<String> senha = new ArrayList<String>();
-    private static ArrayList<String> user = new ArrayList<String>();
+    private static ArrayList<String> usuario = new ArrayList<String>();
 
     public static void main(String[] args) {
         while (true) {
@@ -26,25 +26,24 @@ public class App {
             switch (escolhaMenu) {
                 case 1:
                     GerarTitulo("Consultar usuários cadastrados (Reade)");
-
+                    ConsultarUsuarios();
                     break;
 
                 case 2:
                     GerarTitulo("Consultar um determinado usuário (Reade)");
-
+                    ConsultarUsuario();
                     break;
                 case 3:
                     GerarTitulo("Portal administrativo");
-
-                    logar();
+                    validarAcesso();
+                    break;
                 case 4:
                     System.out.println("Obrigado por usar o programa!");
-                    sc.close();
                     return;
 
                 default:
                     System.out.println("Opção inválida. Por favor, escolha uma opção válida.");
-                    return;
+                    continue;
             }
         }
     }
@@ -181,45 +180,55 @@ public class App {
         System.out.println("Usuário deletado com sucesso!");
     }
 
-    public static int logar() {
-
-        //Finalizar lógica de login
-
-        user.add("admin");
+    public static void validarAcesso() {
+        usuario.add("admin");
         senha.add("admin");
-
-        System.out.print("Usuário: ");
-        String user = sc.nextLine();
-
-        System.out.print("Senha: ");
-        String pass = sc.nextLine();
-
-        if (user.get(0).equals(user) && senha.get(0).equals(pass)) {
-
-            login();
-
-        } else {
-            int cont = 1;
-            while (cont < 3) {
-
-                System.out.println("Usuário ou senha inválidos. Tente novamente.\n");
-
-                System.out.println("Deseja resgatar sua senha? (S/N)");
-                String resgatar = sc.nextLine();
-
-                if (resgatar.equalsIgnoreCase("s")) {
-                    resgatarSenha();
+    
+        int tentativas = 0;
+        boolean acessoValido = false;
+    
+        while (tentativas < 3 && !acessoValido) {
+            System.out.print("Usuário: ");
+            String user = sc.nextLine();
+    
+            System.out.print("Senha: ");
+            String pass = sc.nextLine();
+    
+            acessoValido = logar(user, pass);
+    
+            if (!acessoValido) {
+                tentativas++;
+                if (tentativas < 3) {
+                    System.out.println("Usuário ou senha inválidos. Tente novamente.\n");
+    
+                    System.out.println("Deseja resgatar sua senha? (S/N)");
+                    String resgatar = sc.nextLine();
+    
+                    if (resgatar.equalsIgnoreCase("s")) {
+                        resgatarSenha();
+                        // Se o usuário resgatar a senha, reiniciar a contagem de tentativas
+                        tentativas = 0;
+                    }
                 }
             }
-
-            cont++;
         }
-        return 1;
+    
+        if (!acessoValido) {
+            System.out.println("Número máximo de tentativas excedido.");
+        }
     }
+    
+    public static boolean logar(String user, String pass) {
+        if (usuario.get(0).equals(user) && senha.get(0).equals(pass)) {
+            login(user);
+            return true;
+        }
+        return false;
+    }
+    
 
-    public static int login() {
-
-        System.out.printf("%nBem vindo, %s, este é o portal administrativo!%n%n", user);
+    public static int login(String user) {
+        System.out.printf("%nBem vindo, %s, este é o portal administrativo!%n%n", usuario);
 
         System.out.printf("""
                 Escolha uma opção:
@@ -251,13 +260,11 @@ public class App {
                 deletarUsuario();
                 break;
             case 6:
-                sc.close();
                 return 0;
             default:
                 System.out.println("Opção inválida. Por favor, escolha uma opção válida. \n");
                 return 1;
         }
-
         return 1;
     }
 
@@ -271,5 +278,4 @@ public class App {
             System.out.println("Usuário não encontrado.");
         }
     }
-
 }
