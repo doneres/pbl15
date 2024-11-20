@@ -1,21 +1,19 @@
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
     private static Scanner sc = new Scanner(System.in);
-    private static ArrayList<String> nomes = new ArrayList<String>();
-    private static ArrayList<String> telefone = new ArrayList<String>();
-    private static ArrayList<String> senha = new ArrayList<String>();
-    private static ArrayList<String> usuario = new ArrayList<String>();
+    private static final String FILE_NAME = "usuarios.txt";
 
     public static void main(String[] args) {
         while (true) {
             System.out.printf("""
-
                     Escolha uma opção:
 
-                    1 - Consultar usuários cadastrados (Reade);
-                    2 - Consultar um determinado usuário (Reade);
+                    1 - Consultar usuários cadastrados (Read);
+                    2 - Consultar um determinado usuário (Read);
                     3 - Portal administrativo;
                     4 - Sair;
 
@@ -25,18 +23,20 @@ public class App {
 
             switch (escolhaMenu) {
                 case 1:
-                    GerarTitulo("Consultar usuários cadastrados (Reade)");
+                    GerarTitulo("Consultar usuários cadastrados (Read)");
                     ConsultarUsuarios();
                     break;
 
                 case 2:
-                    GerarTitulo("Consultar um determinado usuário (Reade)");
+                    GerarTitulo("Consultar um determinado usuário (Read)");
                     ConsultarUsuario();
                     break;
+
                 case 3:
                     GerarTitulo("Portal administrativo");
                     validarAcesso();
                     break;
+
                 case 4:
                     System.out.println("Obrigado por usar o programa!");
                     return;
@@ -55,187 +55,160 @@ public class App {
     public static void CadastrarUsuario() {
         System.out.print("Nome Completo: ");
         String nome = sc.nextLine();
-        nomes.add(nome);
 
         System.out.print("Telefone (11 1 1111-1111): ");
         String numero = sc.nextLine();
-        telefone.add(numero);
 
         System.out.print("Senha: ");
-        String password = sc.nextLine();
-        senha.add(password);
+        String senha = sc.nextLine();
+
+        String registro = nome + "," + numero + "," + senha;
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
+            writer.write(registro);
+            writer.newLine();
+            System.out.println("Usuário cadastrado com sucesso!");
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar o usuário: " + e.getMessage());
+        }
     }
 
     public static void ConsultarUsuarios() {
-        System.out.println("Lista de usuarios cadastrados:\n");
+        List<String> usuarios = carregarUsuarios();
 
-        if (nomes.isEmpty()) {
+        if (usuarios.isEmpty()) {
             System.out.println("Nenhum usuário foi cadastrado ainda.");
         } else {
-            for (int i = 0; i < nomes.size(); i++) {
+            for (int i = 0; i < usuarios.size(); i++) {
+                String[] dados = usuarios.get(i).split(",");
                 System.out.println("Usuário #" + (i + 1));
-                System.out.println("Nome: " + nomes.get(i));
-                System.out.println("Telefone: " + telefone.get(i));
+                System.out.println("Nome: " + dados[0]);
+                System.out.println("Telefone: " + dados[1]);
                 System.out.println("-----------------------");
             }
-            System.out.println(" ");
         }
     }
 
     public static void ConsultarUsuario() {
-        System.out.println("\nLista de usuarios cadastrados:\n");
-        for (int i = 0; i < nomes.size(); i++) {
-            System.out.println("Usuário #" + (i + 1));
-            System.out.println("Nome: " + nomes.get(i));
+        List<String> usuarios = carregarUsuarios();
+
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário foi cadastrado ainda.");
+            return;
         }
 
-        System.out.print("Digite o index correspondente a um usuário: ");
+        System.out.println("\nLista de usuários cadastrados:\n");
+        for (int i = 0; i < usuarios.size(); i++) {
+            String[] dados = usuarios.get(i).split(",");
+            System.out.println("Usuário #" + (i + 1) + ": " + dados[0]);
+        }
+
+        System.out.print("Digite o índice correspondente a um usuário: ");
         int index = sc.nextInt();
         sc.nextLine();
-        index--;
 
-        System.out.println(" ");
-        System.out.println("Nome: " + nomes.get(index));
-        System.out.println("Telefone: " + telefone.get(index));
+        if (index < 1 || index > usuarios.size()) {
+            System.out.println("Índice inválido.");
+            return;
+        }
 
+        String[] dados = usuarios.get(index - 1).split(",");
+        System.out.println("Nome: " + dados[0]);
+        System.out.println("Telefone: " + dados[1]);
     }
 
     public static void AtualizarUsuario() {
+        List<String> usuarios = carregarUsuarios();
+
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário foi cadastrado ainda.");
+            return;
+        }
+
         System.out.println("\nLista de usuários cadastrados:\n");
-        for (int i = 0; i < nomes.size(); i++) {
-            System.out.println("Usuário #" + (i + 1));
-            System.out.println("Nome: " + nomes.get(i));
+        for (int i = 0; i < usuarios.size(); i++) {
+            String[] dados = usuarios.get(i).split(",");
+            System.out.println("Usuário #" + (i + 1) + ": " + dados[0]);
         }
 
         System.out.print("Digite o índice correspondente a um usuário: ");
-        int usuarioSelecionado = sc.nextInt();
+        int index = sc.nextInt();
         sc.nextLine();
-        usuarioSelecionado--;
 
-        if (usuarioSelecionado < 0 || usuarioSelecionado >= nomes.size()) {
+        if (index < 1 || index > usuarios.size()) {
             System.out.println("Índice inválido.");
             return;
         }
 
-        System.out.printf("""
+        String[] dados = usuarios.get(index - 1).split(",");
+        System.out.println("Nome atual: " + dados[0]);
+        System.out.println("Telefone atual: " + dados[1]);
 
-                    1 - Nome
-                    2 - Telefone
-                    3 - Senha
+        System.out.print("Novo nome: ");
+        String novoNome = sc.nextLine();
+        System.out.print("Novo telefone: ");
+        String novoTelefone = sc.nextLine();
+        System.out.print("Nova senha: ");
+        String novaSenha = sc.nextLine();
 
-                """);
-        System.out.print("Escolha uma opção: ");
-        int escolhaAtualizacao = sc.nextInt();
-        sc.nextLine();
-
-        switch (escolhaAtualizacao) {
-            case 1:
-                System.out.print("Digite o novo nome: ");
-                String novoNome = sc.nextLine();
-                nomes.set(usuarioSelecionado, novoNome);
-                System.out.println("Nome atualizado com sucesso!");
-                break;
-
-            case 2:
-                System.out.print("Digite o novo telefone: ");
-                String novoTelefone = sc.nextLine();
-                telefone.set(usuarioSelecionado, novoTelefone);
-                System.out.println("Telefone atualizado com sucesso!");
-                break;
-
-            case 3:
-                System.out.print("Digite a nova senha: ");
-                String novaSenha = sc.nextLine();
-                senha.set(usuarioSelecionado, novaSenha);
-                System.out.println("Senha atualizada com sucesso!");
-                break;
-
-            default:
-                System.out.println("Opção inválida. Nenhuma atualização foi feita.");
-                break;
-        }
+        usuarios.set(index - 1, novoNome + "," + novoTelefone + "," + novaSenha);
+        salvarUsuarios(usuarios);
+        System.out.println("Usuário atualizado com sucesso!");
     }
 
     public static void deletarUsuario() {
+        List<String> usuarios = carregarUsuarios();
+
+        if (usuarios.isEmpty()) {
+            System.out.println("Nenhum usuário foi cadastrado ainda.");
+            return;
+        }
+
         System.out.println("\nLista de usuários cadastrados:\n");
-        for (int i = 0; i < nomes.size(); i++) {
-            System.out.println("Usuário #" + (i + 1));
-            System.out.println("Nome: " + nomes.get(i));
+        for (int i = 0; i < usuarios.size(); i++) {
+            String[] dados = usuarios.get(i).split(",");
+            System.out.println("Usuário #" + (i + 1) + ": " + dados[0]);
         }
 
         System.out.print("Digite o índice correspondente a um usuário: ");
-        int usuarioSelecionado = sc.nextInt();
+        int index = sc.nextInt();
         sc.nextLine();
-        usuarioSelecionado--;
 
-        if (usuarioSelecionado < 0 || usuarioSelecionado >= nomes.size()) {
+        if (index < 1 || index > usuarios.size()) {
             System.out.println("Índice inválido.");
             return;
         }
 
-        nomes.remove(usuarioSelecionado);
-        telefone.remove(usuarioSelecionado);
-        senha.remove(usuarioSelecionado);
-
+        usuarios.remove(index - 1);
+        salvarUsuarios(usuarios);
         System.out.println("Usuário deletado com sucesso!");
     }
 
     public static void validarAcesso() {
-        usuario.add("admin");
-        senha.add("admin");
-    
-        int tentativas = 0;
-        boolean acessoValido = false;
-    
-        while (tentativas < 3 && !acessoValido) {
-            System.out.print("Usuário: ");
-            String user = sc.nextLine();
-    
-            System.out.print("Senha: ");
-            String pass = sc.nextLine();
-    
-            acessoValido = logar(user, pass);
-    
-            if (!acessoValido) {
-                tentativas++;
-                if (tentativas < 3) {
-                    System.out.println("Usuário ou senha inválidos. Tente novamente.\n");
-    
-                    System.out.println("Deseja resgatar sua senha? (S/N)");
-                    String resgatar = sc.nextLine();
-    
-                    if (resgatar.equalsIgnoreCase("s")) {
-                        resgatarSenha();
-                        // Se o usuário resgatar a senha, reiniciar a contagem de tentativas
-                        tentativas = 0;
-                    }
-                }
-            }
-        }
-    
-        if (!acessoValido) {
-            System.out.println("Número máximo de tentativas excedido.");
+        System.out.print("Usuário: ");
+        String user = sc.nextLine();
+
+        System.out.print("Senha: ");
+        String pass = sc.nextLine();
+
+        if ("admin".equals(user) && "admin".equals(pass)) {
+            System.out.println("Bem-vindo, administrador!");
+            int escolha;
+            do {
+                escolha = login();
+            } while (escolha != 0);
+        } else {
+            System.out.println("Usuário ou senha inválidos.");
         }
     }
-    
-    public static boolean logar(String user, String pass) {
-        if (usuario.get(0).equals(user) && senha.get(0).equals(pass)) {
-            login(user);
-            return true;
-        }
-        return false;
-    }
-    
 
-    public static int login(String user) {
-        System.out.printf("%nBem vindo, %s, este é o portal administrativo!%n%n", usuario);
-
+    public static int login() {
         System.out.printf("""
                 Escolha uma opção:
 
                 1 - Cadastrar um usuário (Create);
-                2 - Consultar usuários cadastrados (Reade);
-                3 - Consultar um determinado usuário (Reade);
+                2 - Consultar usuários cadastrados (Read);
+                3 - Consultar um determinado usuário (Read);
                 4 - Atualizar um registro de usuário (Update);
                 5 - Deletar um registro de usuário (Delete);
                 6 - Sair;
@@ -244,38 +217,40 @@ public class App {
         int escolha = sc.nextInt();
         sc.nextLine();
         switch (escolha) {
-            case 1:
-                CadastrarUsuario();
-                break;
-            case 2:
-                ConsultarUsuarios();
-                break;
-            case 3:
-                ConsultarUsuario();
-                break;
-            case 4:
-                AtualizarUsuario();
-                break;
-            case 5:
-                deletarUsuario();
-                break;
-            case 6:
+            case 1 -> CadastrarUsuario();
+            case 2 -> ConsultarUsuarios();
+            case 3 -> ConsultarUsuario();
+            case 4 -> AtualizarUsuario();
+            case 5 -> deletarUsuario();
+            case 6 -> {
                 return 0;
-            default:
-                System.out.println("Opção inválida. Por favor, escolha uma opção válida. \n");
-                return 1;
+            }
+            default -> System.out.println("Opção inválida. Tente novamente.");
         }
         return 1;
     }
 
-    public static void resgatarSenha() {
-        System.out.println("Digite o seu nome de usuário: ");
-        String user = sc.nextLine();
+    private static List<String> carregarUsuarios() {
+        List<String> usuarios = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                usuarios.add(linha);
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar usuários: " + e.getMessage());
+        }
+        return usuarios;
+    }
 
-        if (user.equals("admin")) {
-            System.out.println("Sua senha é: admin");
-        } else {
-            System.out.println("Usuário não encontrado.");
+    private static void salvarUsuarios(List<String> usuarios) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (String usuario : usuarios) {
+                writer.write(usuario);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar usuários: " + e.getMessage());
         }
     }
 }
